@@ -214,6 +214,11 @@ func serverSetup() (launched bool, listeners []net.Listener) {
 			continue
 		}
 
+		// make sure to bind in both IPv4 and IPv6 if 0.0.0.0 is provided
+		// TOR_PT_SERVER_BINDADDR is a required parameter of the pt-spec, so the address can't be skipped
+		if bindaddr.Addr.IP.String() == "0.0.0.0" {
+			bindaddr.Addr.IP = nil
+		}
 		ln, err := net.ListenTCP("tcp", bindaddr.Addr)
 		if err != nil {
 			_ = pt.SmethodError(name, err.Error())
